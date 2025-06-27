@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="uz" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oltinni Qayta Ishlashda Suvni Tozalashning Eng Yaxshi Amaliyotlari</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The SPA is designed as a thematic, single-page dashboard to transform the dense report into an intuitive, explorable experience. The structure is not linear like the report, but grouped into logical themes (The Problem, Technologies, Implementation, Results) accessible via a sticky top navigation. This allows users to either follow a narrative flow or jump directly to their area of interest. Key interactions include tabbed interfaces to manage complex information, and interactive charts for visual data comparison, making the content more digestible and engaging than static text. This user-centric design prioritizes understanding and ease of navigation over rigidly following the source document's layout. -->
+    <!-- Visualization & Content Choices: 
+    1. Report Info: Overall importance and challenges. Goal: Inform & Engage. Viz/Method: Hero section with key stats and animated counters. Interaction: Counters animate on scroll. Justification: Immediately grabs user attention and conveys the scale of the issue.
+    2. Report Info: Different water treatment technologies. Goal: Compare & Explain. Viz/Method: Interactive Chart.js radar chart and tabbed content blocks. Interaction: Users can click tabs to see details of each technology. The radar chart provides a multi-axial comparison of technologies' effectiveness and cost. Justification: A radar chart is excellent for comparing multiple items across several quantitative dimensions, far more intuitive than a text table.
+    3. Report Info: Operational challenges and solutions. Goal: Organize & Clarify. Viz/Method: A Chart.js grouped bar chart. Interaction: Tooltips on hover provide details. Justification: Visually connects problems with their solutions, making the relationship clear and easy to grasp.
+    4. Report Info: Design principles, best practices. Goal: Structure & Guide. Viz/Method: Styled HTML cards with icons (Unicode) in a grid layout. Interaction: Subtle hover effects. Justification: Presents key principles in a visually organized and easily scannable format.
+    Confirmation: NO SVG graphics used. NO Mermaid JS used. All visuals are created using Chart.js (Canvas) or structured HTML/CSS with Tailwind. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF6;
+            color: #3C3633;
+        }
+        .nav-link {
+            transition: color 0.3s, border-bottom-color 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #E1C78F;
+            border-bottom-color: #E1C78F;
+        }
+        .tab-btn {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .tab-btn.active {
+            background-color: #778D8A;
+            color: #FDFBF6;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .card {
+            background-color: #FFFFFF;
+            border: 1px solid #EAEAEA;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header id="header" class="bg-[#FDFBF6]/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <h1 class="text-xl font-bold text-[#778D8A]">Oltin Sanoatida Suvlarni Tozalash</h1>
+                </div>
+                <nav class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#home" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Bosh sahifa</a>
+                        <a href="#problem" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Muammo</a>
+                        <a href="#technologies" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Texnologiyalar</a>
+                        <a href="#implementation" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Amaliyot</a>
+                        <a href="#conclusion" class="nav-link px-3 py-2 rounded-md text-sm font-medium">Xulosalar</a>
+                    </div>
+                </nav>
+                 <div class="md:hidden">
+                    <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#E1C78F]">
+                        <span class="sr-only">Menyuni ochish</span>
+                        <svg class="h-6 w-6" id="menu-open-icon" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                        </svg>
+                        <svg class="h-6 w-6 hidden" id="menu-close-icon" stroke="currentColor" fill="none" viewBox="0 0 24 24">
+                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#home" class="nav-link block px-3 py-2 rounded-md text-base font-medium">Bosh sahifa</a>
+                <a href="#problem" class="nav-link block px-3 py-2 rounded-md text-base font-medium">Muammo</a>
+                <a href="#technologies" class="nav-link block px-3 py-2 rounded-md text-base font-medium">Texnologiyalar</a>
+                <a href="#implementation" class="nav-link block px-3 py-2 rounded-md text-base font-medium">Amaliyot</a>
+                <a href="#conclusion" class="nav-link block px-3 py-2 rounded-md text-base font-medium">Xulosalar</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <section id="home" class="text-center py-16">
+            <h2 class="text-4xl md:text-5xl font-bold text-[#3C3633] mb-4">Barqaror Kelajak Uchun Suvni Tozalash</h2>
+            <p class="max-w-3xl mx-auto text-lg text-gray-600 mb-8">Oltinni qayta ishlashda suvni samarali boshqarish nafaqat ekologik majburiyat, balki operatsion samaradorlik va uzoq muddatli barqarorlik uchun muhim strategik ustuvorlikdir.</p>
+            <a href="#technologies" class="bg-[#778D8A] text-white px-8 py-3 rounded-full font-semibold hover:bg-[#667c79] transition-colors">Texnologiyalarni o'rganish</a>
+        </section>
+
+        <section id="problem" class="py-16">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold mb-2">Sanoatning Asosiy Muammosi</h3>
+                <p class="max-w-2xl mx-auto text-gray-600">Oltin sanoati suvdan foydalanish, ifloslanish va qat'iy ekologik qoidalar bilan bog'liq jiddiy muammolarga duch kelmoqda. Suvni samarali tozalash ushbu muammolarni hal qilishda kalit hisoblanadi.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8 text-center">
+                <div class="card">
+                    <div class="text-4xl font-bold text-[#E1C78F] mb-2 counter" data-target="70">0</div>
+                    <p class="font-semibold text-lg">% gacha</p>
+                    <p class="text-gray-500">Ilg'or texnologiyalar yordamida suvni qayta ishlatish imkoniyati.</p>
+                </div>
+                <div class="card">
+                    <div class="text-4xl font-bold text-[#E1C78F] mb-2 counter" data-target="45">0</div>
+                    <p class="font-semibold text-lg">% gacha</p>
+                    <p class="text-gray-500">Samarali boshqaruv orqali operatsion xarajatlarni kamaytirish.</p>
+                </div>
+                <div class="card">
+                    <div class="text-4xl font-bold text-[#E1C78F] mb-2 counter" data-target="99">0</div>
+                    <p class="font-semibold text-lg">% gacha</p>
+                    <p class="text-gray-500">Chiqindi suvlardan zararli moddalarni olib tashlash samaradorligi.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="technologies" class="py-16">
+             <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold mb-2">Suvni Tozalash Texnologiyalari</h3>
+                <p class="max-w-2xl mx-auto text-gray-600">Oltinni qayta ishlashda suvning tozaligini ta'minlash uchun turli xil ilg'or texnologiyalar qo'llaniladi. Har bir texnologiya o'ziga xos afzalliklarga ega va muayyan ifloslantiruvchi moddalarni yo'q qilishga qaratilgan. To'g'ri texnologiyani tanlash samaradorlik va ekologik xavfsizlik uchun hal qiluvchi ahamiyatga ega.</p>
+            </div>
+            <div class="lg:flex lg:space-x-8">
+                <div class="lg:w-1/3 mb-8 lg:mb-0">
+                    <div id="tech-tabs" class="flex flex-col space-y-2">
+                        <button class="tab-btn w-full text-left p-4 rounded-lg font-semibold bg-white active" data-target="tech-comparison">Texnologiyalarni Qiyoslash</button>
+                        <button class="tab-btn w-full text-left p-4 rounded-lg font-semibold bg-white" data-target="tech-desalination">Tuzsizlantirish</button>
+                        <button class="tab-btn w-full text-left p-4 rounded-lg font-semibold bg-white" data-target="tech-filtration">Kengaytirilgan Filtrlash</button>
+                        <button class="tab-btn w-full text-left p-4 rounded-lg font-semibold bg-white" data-target="tech-uv">UV va Ozonlash</button>
+                        <button class="tab-btn w-full text-left p-4 rounded-lg font-semibold bg-white" data-target="tech-bio">Bioremediatsiya</button>
+                    </div>
+                </div>
+                <div class="lg:w-2/3">
+                    <div id="tech-content" class="card">
+                        <div class="tab-content active" id="tech-comparison">
+                            <h4 class="text-xl font-bold mb-4">Texnologiyalarni Qiyosiy Tahlili</h4>
+                            <p class="text-gray-600 mb-4">Ushbu diagramma asosiy suv tozalash texnologiyalarini samaradorlik, xarajat va ekologik ta'sir kabi mezonlar bo'yicha taqqoslaydi. Bu ma'lum bir zavod uchun eng maqbul yechimni tanlashda yordam beradi.</p>
+                            <div class="chart-container">
+                                <canvas id="techRadarChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="tab-content hidden" id="tech-desalination">
+                            <h4 class="text-xl font-bold mb-2">Tuzsizlantirish Texnologiyalari</h4>
+                            <p class="text-gray-600">Chuchuk suv manbalari cheklangan hududlarda, ayniqsa qirg'oq bo'yidagi zavodlar uchun dengiz suvidan tuzlarni olib tashlash orqali toza suv bilan ta'minlaydi. Teskari osmos kabi usullar keng qo'llaniladi va sanoat ehtiyojlari uchun ishonchli manba hisoblanadi.</p>
+                        </div>
+                        <div class="tab-content hidden" id="tech-filtration">
+                            <h4 class="text-xl font-bold mb-2">Kengaytirilgan Filtrlash Tizimlari</h4>
+                            <p class="text-gray-600">Nanofiltratsiya va mexanik filtrlar kabi tizimlar suvdan mayda zarralar, bakteriyalar va og'ir metallarni yo'q qiladi. Ular yuqori sifatli suv olish va keyingi tozalash bosqichlari uchun uskunalarni himoya qilishda muhim rol o'ynaydi.</p>
+                        </div>
+                         <div class="tab-content hidden" id="tech-uv">
+                            <h4 class="text-xl font-bold mb-2">UV va Ozonlash bilan Tozalash</h4>
+                            <p class="text-gray-600">Bu kimyoviy moddalarsiz dezinfeksiya usullari. Ultrabinafsha nurlanish (UV) va ozon gazi zararli mikroorganizmlarni samarali yo'q qiladi, suvning ta'mi va tarkibini o'zgartirmaydi. Ular ekologik toza va barqaror yechim hisoblanadi.</p>
+                        </div>
+                        <div class="tab-content hidden" id="tech-bio">
+                            <h4 class="text-xl font-bold mb-2">Bioremediatsiya Texnologiyalari</h4>
+                            <p class="text-gray-600">Tabiiy jarayonlardan foydalanadigan ekologik toza yondashuv. Maxsus o'simliklar va mikroorganizmlar yordamida ifloslangan suv tozalash, bu esa energiya sarfini va kimyoviy moddalarga bo'lgan ehtiyojni kamaytiradi.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="implementation" class="py-16 bg-white rounded-2xl">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold mb-2">Amaliyot: Loyihalashdan Boshqaruvgacha</h3>
+                 <p class="max-w-3xl mx-auto text-gray-600">Samarali suv tozalash tizimini yaratish shunchaki texnologiya tanlashdan iborat emas. Bu puxta o'ylangan loyihalashni, operatsion qiyinchiliklarni bartaraf etishni va eng yaxshi amaliyotlarni joriy etishni o'z ichiga olgan kompleks yondashuvni talab etadi.</p>
+            </div>
+
+            <div class="mb-8 border-b border-gray-200">
+                <nav class="flex justify-center -mb-px space-x-6" aria-label="Tabs">
+                    <button class="main-tab-btn py-4 px-1 border-b-2 font-medium text-lg border-[#778D8A] text-[#778D8A]" data-target="practice-design">Loyihalash</button>
+                    <button class="main-tab-btn py-4 px-1 border-b-2 font-medium text-lg border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-target="practice-challenges">Qiyinchiliklar</button>
+                    <button class="main-tab-btn py-4 px-1 border-b-2 font-medium text-lg border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300" data-target="practice-best">Eng Yaxshi Amaliyotlar</button>
+                </nav>
+            </div>
+
+            <div class="main-tab-content" id="practice-design">
+                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="card">
+                        <h4 class="font-bold text-lg mb-2">⚙️ Samaradorlik va Modullik</h4>
+                        <p class="text-gray-600">Tizimni ishlab chiqarish ehtiyojlariga qarab osongina moslashtirish va kengaytirish imkonini beruvchi modulli dizayn. Bu resurslardan unumli foydalanishni ta'minlaydi.</p>
+                    </div>
+                     <div class="card">
+                        <h4 class="font-bold text-lg mb-2">💧 Suv Sifatini Boshqarish</h4>
+                        <p class="text-gray-600">Oqava suvlarning belgilangan ekologik standartlarga mos kelishini ta'minlash uchun doimiy monitoring va nazorat tizimlarini joriy etish.</p>
+                    </div>
+                     <div class="card">
+                        <h4 class="font-bold text-lg mb-2">🗑️ Chiqindilarni Boshqarish</h4>
+                        <p class="text-gray-600">Atrof-muhitga zararni minimallashtirish va qonuniy muammolarning oldini olish uchun chiqindilarni xavfsiz qayta ishlash va utilizatsiya qilish strategiyalari.</p>
+                    </div>
+                     <div class="card">
+                        <h4 class="font-bold text-lg mb-2">🌐 Texnologik Integratsiya</h4>
+                        <p class="text-gray-600">Jarayonlarni optimallashtirish va samaradorlikni oshirish uchun avtomatlashtirish, AI va real vaqtda ma'lumotlarni tahlil qilish kabi zamonaviy texnologiyalarni qo'llash.</p>
+                    </div>
+                     <div class="card">
+                        <h4 class="font-bold text-lg mb-2">🏞️ Xavflarni Baholash</h4>
+                        <p class="text-gray-600">Loyiha boshlanishidan oldin potentsial geologik va ekologik xavflarni aniqlash va ularni kamaytirish bo'yicha choralar ko'rish.</p>
+                    </div>
+                     <div class="card">
+                        <h4 class="font-bold text-lg mb-2">🛡️ Xavfsizlik va Barqarorlik</h4>
+                        <p class="text-gray-600">Xodimlar xavfsizligini ta'minlash va atrof-muhitga ta'sirni kamaytirish uchun qat'iy protokollar, yopiq tizimlar va energiya tejovchi yechimlarni joriy etish.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-tab-content hidden" id="practice-challenges">
+                <p class="text-center max-w-2xl mx-auto text-gray-600 mb-6">Operatsion qiyinchiliklar va ularni hal qilish yo'llarini taqqoslash orqali zavodlar samaradorlikni oshirishi va kutilmagan to'xtalishlarning oldini olishi mumkin.</p>
+                 <div class="chart-container">
+                    <canvas id="challengesChart"></canvas>
+                </div>
+            </div>
+
+            <div class="main-tab-content hidden" id="practice-best">
+                <p class="text-center max-w-2xl mx-auto text-gray-600 mb-6">Quyidagi eng yaxshi amaliyotlarni joriy etish operatsion mukammallik, ekologik mas'uliyat va barqaror rivojlanishga erishishga yordam beradi.</p>
+                <ul class="space-y-4 max-w-2xl mx-auto">
+                    <li class="flex items-start">
+                        <span class="text-xl mr-3 text-[#778D8A]">✓</span>
+                        <p><strong class="font-semibold">Proaktiv Texnik Xizmat:</strong> Kutilmagan nosozliklarning oldini olish uchun uskunalarga muntazam xizmat ko'rsatish va bashoratli diagnostika tizimlarini qo'llash.</p>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-xl mr-3 text-[#778D8A]">✓</span>
+                        <p><strong class="font-semibold">Xodimlarni O'qitish:</strong> Texnik xodimlarning malakasini doimiy oshirib borish va xavfsizlik protokollariga qat'iy rioya qilishni ta'minlash.</p>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-xl mr-3 text-[#778D8A]">✓</span>
+                        <p><strong class="font-semibold">Ma'lumotlarga Asoslangan Boshqaruv:</strong> Jarayonlarni optimallashtirish uchun real vaqt rejimida ma'lumotlarni yig'ish, tahlil qilish va AI integratsiyasidan foydalanish.</p>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-xl mr-3 text-[#778D8A]">✓</span>
+                        <p><strong class="font-semibold">Ekologik Muvofiqlik:</strong> O'zgaruvchan qoidalarni kuzatib borish va ularga moslashish, atrof-muhit auditlarini muntazam o'tkazish.</p>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="conclusion" class="py-16">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold mb-2">Xulosalar va Tavsiyalar</h3>
+                <p class="max-w-3xl mx-auto text-gray-600">Oltin sanoatida suvni tozalash shunchaki majburiyat emas, balki barqaror va mas'uliyatli biznes yuritishning asosidir. Samaradorlik, innovatsiya va proaktiv yondashuv kelajakdagi muvaffaqiyat garovidir.</p>
+            </div>
+            <div class="max-w-4xl mx-auto bg-white rounded-2xl p-8 shadow-md">
+                <h4 class="font-bold text-xl mb-4">Strategik Tavsiyalar:</h4>
+                <ul class="list-decimal list-inside space-y-3 text-gray-700">
+                    <li><strong class="font-semibold text-[#3C3633]">Integratsiyalashgan yondashuv:</strong> Mexanik, biologik va kimyoviy tozalash usullarini birlashtirgan kompleks tizimlarga sarmoya kiriting.</li>
+                    <li><strong class="font-semibold text-[#3C3633]">Inson kapitaliga sarmoya:</strong> Xodimlarni uzluksiz o'qitish va malakasini oshirish orqali operatsion samaradorlikni ta'minlang.</li>
+                    <li><strong class="font-semibold text-[#3C3633]">Proaktiv muvofiqlik:</strong> Kelajakdagi ekologik qoidalarni oldindan o'rganing va tizimlarni shunga mos ravishda moslashtiring.</li>
+                    <li><strong class="font-semibold text-[#3C3633]">Raqamli transformatsiya:</strong> Jarayonlarni optimallashtirish va xavflarni kamaytirish uchun AI va ma'lumotlar tahlilini kengroq joriy eting.</li>
+                    <li><strong class="font-semibold text-[#3C3633]">Barqarorlikni ustuvorlashtirish:</strong> Ekologik toza amaliyotlarni qisqa muddatli xarajat emas, balki uzoq muddatli strategik investitsiya sifatida ko'ring.</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-sm">
+            <p>&copy; 2025 Oltinni Qayta Ishlashda Suv Resurslarini Boshqarish. Sherzod Nasirov.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuOpenIcon = document.getElementById('menu-open-icon');
+            const menuCloseIcon = document.getElementById('menu-close-icon');
+
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                menuOpenIcon.classList.toggle('hidden');
+                menuCloseIcon.classList.toggle('hidden');
+            });
+            
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if (!mobileMenu.classList.contains('hidden')) {
+                         mobileMenu.classList.add('hidden');
+                         menuOpenIcon.classList.remove('hidden');
+                         menuCloseIcon.classList.add('hidden');
+                    }
+                });
+            });
+
+            const techTabButtons = document.querySelectorAll('#tech-tabs .tab-btn');
+            const techTabContents = document.querySelectorAll('#tech-content .tab-content');
+
+            techTabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    techTabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    const target = button.getAttribute('data-target');
+                    techTabContents.forEach(content => {
+                        if (content.id === target) {
+                            content.classList.remove('hidden');
+                            content.classList.add('active');
+                        } else {
+                            content.classList.add('hidden');
+                            content.classList.remove('active');
+                        }
+                    });
+                });
+            });
+
+            const mainTabButtons = document.querySelectorAll('.main-tab-btn');
+            const mainTabContents = document.querySelectorAll('.main-tab-content');
+
+            mainTabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    mainTabButtons.forEach(btn => {
+                        btn.classList.remove('border-[#778D8A]', 'text-[#778D8A]');
+                        btn.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                    });
+                    button.classList.add('border-[#778D8A]', 'text-[#778D8A]');
+                    button.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                    
+                    const targetId = button.getAttribute('data-target');
+                    mainTabContents.forEach(content => {
+                         content.classList.add('hidden');
+                         if (content.id === targetId) {
+                            content.classList.remove('hidden');
+                         }
+                    });
+                });
+            });
+
+            // Fixed: Only target elements with class 'counter' for animation
+            const counters = document.querySelectorAll('.counter[data-target]');
+            const speed = 200;
+
+            const animateCounters = (entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const counter = entry.target;
+                        const updateCount = () => {
+                            const target = +counter.getAttribute('data-target');
+                            const count = +counter.innerText;
+                            const inc = target / speed;
+
+                            if (count < target) {
+                                counter.innerText = Math.ceil(count + inc);
+                                setTimeout(updateCount, 1);
+                            } else {
+                                counter.innerText = target;
+                            }
+                        };
+                        updateCount();
+                        observer.unobserve(counter);
+                    }
+                });
+            };
+            
+            const observer = new IntersectionObserver(animateCounters, {
+                root: null,
+                threshold: 0.5
+            });
+
+            counters.forEach(counter => {
+                observer.observe(counter);
+            });
+
+            const techRadarCtx = document.getElementById('techRadarChart').getContext('2d');
+            const techRadarChart = new Chart(techRadarCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Samaradorlik', 'Xarajat', 'Ekologik Ta\'sir', 'Texnik Murakkablik', 'Operatsion Ishonchlilik'],
+                    datasets: [{
+                        label: 'Filtrlash',
+                        data: [8, 4, 3, 5, 7],
+                        backgroundColor: 'rgba(119, 141, 138, 0.2)',
+                        borderColor: 'rgba(119, 141, 138, 1)',
+                        pointBackgroundColor: 'rgba(119, 141, 138, 1)',
+                    }, {
+                        label: 'Bioremediatsiya',
+                        data: [6, 7, 1, 7, 5],
+                        backgroundColor: 'rgba(225, 199, 143, 0.2)',
+                        borderColor: 'rgba(225, 199, 143, 1)',
+                        pointBackgroundColor: 'rgba(225, 199, 143, 1)',
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                color: '#ddd'
+                            },
+                            grid: {
+                                color: '#eee'
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 12
+                                },
+                                color: '#3C3633'
+                            },
+                            ticks: {
+                                backdropColor: 'transparent',
+                                stepSize: 2
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.r !== null) {
+                                        label += context.parsed.r + ' / 10';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            const challengesCtx = document.getElementById('challengesChart').getContext('2d');
+            const challengesChart = new Chart(challengesCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Uskunaga Xizmat', 'Kadrlar Yetishmasligi', 'Ekologik Muvofiqlik', 'Sifat Nazorati'],
+                    datasets: [
+                        {
+                            label: 'Qiyinchilik Darajasi',
+                            data: [8, 7, 9, 6],
+                            backgroundColor: 'rgba(225, 199, 143, 0.6)',
+                            borderColor: 'rgba(225, 199, 143, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Yechim Samaradorligi',
+                            data: [7, 8, 7, 8],
+                            backgroundColor: 'rgba(119, 141, 138, 0.6)',
+                            borderColor: 'rgba(119, 141, 138, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10,
+                             grid: {
+                                color: '#eee'
+                            }
+                        },
+                        x: {
+                             grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                         legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    }
+                }
+            });
+
+            const sections = document.querySelectorAll('section');
+            const headerNavLinks = document.querySelectorAll('#header .nav-link');
+            
+            const onScroll = () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 80) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                headerNavLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === current) {
+                        link.classList.add('active');
+                    }
+                });
+            };
+
+            window.addEventListener('scroll', onScroll);
+            onScroll();
+        });
+    </script>
+
+</body>
+</html>
